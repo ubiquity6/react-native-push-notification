@@ -19,7 +19,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.core.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReadableMap;
@@ -312,21 +312,6 @@ public class RNPushNotificationHelper {
                     }
                 }
                 notification.setSound(soundUri);
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notification.setSound(null);
-                AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                    .build();
-
-                int importance = NotificationManager.IMPORTANCE_HIGH;
-                NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, importance);
-                notificationChannel.enableLights(true);
-                notificationChannel.enableVibration(true);
-                notificationChannel.setSound(soundUri, audioAttributes);
-                notificationManager.createNotificationChannel(notificationChannel);
             }
 
             if (bundle.containsKey("ongoing") || bundle.getBoolean("ongoing")) {
