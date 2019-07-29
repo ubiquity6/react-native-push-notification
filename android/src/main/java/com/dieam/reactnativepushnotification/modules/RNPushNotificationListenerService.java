@@ -122,7 +122,7 @@ public class RNPushNotificationListenerService extends FirebaseMessagingService 
         bundle.putBoolean("foreground", isForeground);
         bundle.putBoolean("userInteraction", false);
         if (bundle.getBundle("data") == null) {
-            bundle.addBundle("data", bundle.deepCopy());
+            bundle.putBundle("data", bundle.deepCopy());
         }
         jsDelivery.notifyNotification(bundle);
 
