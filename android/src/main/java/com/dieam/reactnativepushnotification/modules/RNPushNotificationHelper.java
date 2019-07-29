@@ -223,6 +223,7 @@ public class RNPushNotificationHelper {
                     .setTicker(bundle.getString("ticker"))
                     .setVisibility(visibility)
                     .setPriority(priority)
+                    .setGroup(context.getPackageName())
                     .setAutoCancel(bundle.getBoolean("autoCancel", true));
 
             String group = bundle.getString("group");
