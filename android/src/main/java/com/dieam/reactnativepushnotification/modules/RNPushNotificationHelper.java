@@ -143,16 +143,23 @@ public class RNPushNotificationHelper {
                 return;
             }
 
-            if (bundle.getString("message") == null) {
-                // this happens when a 'data' notification is received - we do not synthesize a local notification in this case
-                Log.d(LOG_TAG, "Cannot send to notification centre because there is no 'message' field in: " + bundle);
-                return;
+            String msg = bundle.getString("message");
+            if (msg == null) {
+                msg = bundle.getString("pinpoint.notification.body");
+                if (msg == null) {
+                    // this happens when a 'data' notification is received - we do not synthesize a local notification in this case
+                    Log.d(LOG_TAG, "Cannot send to notification centre because there is no 'message' field in: " + bundle);
+                    return;
+                }
             }
 
             String notificationIdString = bundle.getString("id");
             if (notificationIdString == null) {
-                Log.e(LOG_TAG, "No notification ID specified for the notification");
-                return;
+                notificationIdString = bundle.getString("pinpoint.campaign.campaign_id");
+                if (notificationIdString == null) {
+                    Log.e(LOG_TAG, "No notification ID specified for the notification");
+                    return;
+                }
             }
 
             Resources res = context.getResources();
@@ -160,8 +167,11 @@ public class RNPushNotificationHelper {
 
             String title = bundle.getString("title");
             if (title == null) {
-                ApplicationInfo appInfo = context.getApplicationInfo();
-                title = context.getPackageManager().getApplicationLabel(appInfo).toString();
+                title = bundle.getString("pinpoint.notification.title");
+                if (title == null) {
+                    ApplicationInfo appInfo = context.getApplicationInfo();
+                    title = context.getPackageManager().getApplicationLabel(appInfo).toString();
+                }
             }
 
             int priority = NotificationCompat.PRIORITY_HIGH;
@@ -213,6 +223,7 @@ public class RNPushNotificationHelper {
                     .setTicker(bundle.getString("ticker"))
                     .setVisibility(visibility)
                     .setPriority(priority)
+                    .setGroup(context.getPackageName())
                     .setAutoCancel(bundle.getBoolean("autoCancel", true));
 
             String group = bundle.getString("group");
@@ -220,7 +231,7 @@ public class RNPushNotificationHelper {
                 notification.setGroup(group);
             }
 
-            notification.setContentText(bundle.getString("message"));
+            notification.setContentText(msg);
 
             String largeIcon = bundle.getString("largeIcon");
 
@@ -280,9 +291,9 @@ public class RNPushNotificationHelper {
             bundle.putBoolean("userInteraction", true);
             intent.putExtra("notification", bundle);
 
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             if (!bundle.containsKey("playSound") || bundle.getBoolean("playSound")) {
-                Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                String soundName = bundle.getString("soundName");
+                String soundName = bundle.getString("pinpoint.notification.sound");
                 if (soundName != null) {
                     if (!"default".equalsIgnoreCase(soundName)) {
 
